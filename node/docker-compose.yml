@@ -1,0 +1,30 @@
+version: '3' # versão 3 do docker compose
+services: # serviços
+  app: # serviço app (backend que conecta com o banco)
+    build: # informando onde esta a aplicação e o seu Dockerfile
+      context: .
+      dockerfile: Dockerfile
+    ports: # porta da aplicação
+      - "3000:3000"
+    environment: # variáveis de ambiente da aplicação
+      - DB_HOST=database # usando nome do serviço como host, por estarem na mesma rede somente isso é necessário
+      - DB_PORT=5432 # porta do banco
+      - DB_USER=postgres # usuário do banco
+      - DB_PASSWORD=postgres # senha do banco
+      - DB_NAME=test # nome do banco
+    depends_on: # este serviço dependo do serviço database
+      - database
+  
+  database: # serviço do banco de dados postgres
+    image: postgres # usando versão mais atual do postgres
+    environment:
+      POSTGRES_PASSWORD: postgres # senha do banco
+      POSTGRES_USER: postgres # usuário do banco
+      POSTGRES_DB: test # nome do banco
+    ports:
+      - "5432:5432" # porta do banco
+    volumes: # volume do banco
+      - dbdata:/var/lib/postgresql/data
+
+volumes: # criando volume da aplicação
+  dbdata:
